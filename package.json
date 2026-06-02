@@ -1,0 +1,12 @@
+{
+  "name": "@cinatra-ai/assistant-skills",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "description": "Cinatra chat assistant skills — the chat's own system prompt plus its conversational sub-skills (company research, campaign creation, trigger creation). Registered into the skills catalog at workspace level so every member can use them.",
+  "type": "module",
+  "cinatra": {
+    "apiVersion": "cinatra.ai/v1",
+    "kind": "skill",
+    "dependencies": []
+  }
+}
