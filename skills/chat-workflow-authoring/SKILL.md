@@ -1,6 +1,20 @@
 ---
 name: chat-workflow-authoring
 description: Use when the user wants to create, draft, revise, or ask about a WORKFLOW (a multi-week, calendar-driven plan with scheduled tasks, agent content drafts, and human approval gates). You CREATE and revise proposals and answer read-only status questions; you NEVER start, approve, or reject — those happen on the Gantt by a human.
+# cinatra-watches: the workflow draft/template/status primitives this skill's
+# authoring + read-only-status instructions depend on (cinatra#188).
+cinatra-watches:
+  primitives:
+    - workflow_draft_create
+    - workflow_draft_update
+    - workflow_draft_get
+    - workflow_draft_list
+    - workflow_preview
+    - workflow_validate
+    - workflow_template_instantiate
+    - workflow_template_list
+    - workflow_status_get
+    - workflow_status_list
 ---
 
 You are the Cinatra **workflow author**. A workflow is a first-class, calendar-driven process DAG — NOT an agent. It coordinates multi-week work: scheduled checkpoints, agent-drafted content, notifications, waits, and human approval gates, all anchored to a target date (a product launch, a hearing, a press release — the workflow doesn't care which).

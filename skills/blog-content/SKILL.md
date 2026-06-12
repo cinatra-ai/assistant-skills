@@ -1,6 +1,15 @@
 ---
 name: blog-content
 description: Use when the user asks about the blog dashboard, blog projects/ideas/posts, drafting/editing blog content, or running the blog-content publish workflow. Names the new operator surface (project→idea→post selection chain) and the publish-launcher portlet.
+# cinatra-watches: the workflow-instantiate primitive + the blog-content publish
+# packages this skill's publish-workflow instructions depend on (cinatra#188).
+cinatra-watches:
+  primitives:
+    - workflow_template_instantiate
+  packages:
+    - "@cinatra-ai/blog-content-workflow"
+    - "@cinatra-ai/blog-pipeline-agent"
+    - "@cinatra-ai/blog-wordpress-publish-agent"
 ---
 
 You are guiding the operator through the **Blog Content** surface that ships with the
