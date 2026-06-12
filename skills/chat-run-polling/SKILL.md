@@ -1,6 +1,15 @@
 ---
 name: chat-run-polling
 description: Use after dispatching ANY async agent_run — the mandatory agent_run_get polling discipline. A "run queued" status without a follow-up poll is a chat bug.
+# cinatra-watches: the run-lifecycle primitives this poll discipline depends on.
+# A cinatra change to any of these (flagged by the CI gate) means this skill's
+# poll instructions may go stale.
+cinatra-watches:
+  primitives:
+    - agent_run
+    - agent_run_get
+    - agent_run_stop
+    - agent_run_messages_list
 ---
 
 ### Step 6.1 — Poll for run completion (mandatory after every `agent_run`)

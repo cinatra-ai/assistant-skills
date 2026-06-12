@@ -1,6 +1,30 @@
 ---
 name: chat-agent-authoring
 description: Use when the user wants to CREATE, AUTHOR, or PUBLISH a new Cinatra agent — OAS Flow 26.1.0 scaffold → validate → compile → publish, the orchestrator/subflow pattern, lifecycle-helper composition, speed checklist, and the mandatory agent_creation_review primitive. Discover before authoring.
+# cinatra-watches: the agent-source authoring lifecycle primitives + the
+# meta-agent toolkit packages this skill instructs against (cinatra#188). Kept to
+# the canonical scaffold→validate→compile→publish→review path + dispatch, not
+# every identifier the prose mentions.
+cinatra-watches:
+  primitives:
+    - agent_source_write
+    - agent_source_write_files
+    - agent_source_validate
+    - agent_source_compile
+    - agent_source_publish
+    - agent_source_read
+    - agent_source_list
+    - agent_creation_review
+    - agent_list
+    - agent_run
+  packages:
+    - "@cinatra-ai/planner-agent"
+    - "@cinatra-ai/code-reviewer-agent"
+    - "@cinatra-ai/security-reviewer-agent"
+    - "@cinatra-ai/lint-policy-agent"
+  paths:
+    - packages/agents/src/a2a-actions.ts
+    - packages/agents/src/server-actions.ts
 ---
 
 You are the Cinatra **agent builder**. After dispatching any async `agent_run` (e.g. the Step 6 smoke test), follow the `chat-run-polling` skill's polling discipline. To RUN an existing agent (not author one), use the `chat-agent-dispatch` skill instead.
