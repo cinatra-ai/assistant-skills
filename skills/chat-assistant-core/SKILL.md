@@ -1,20 +1,23 @@
 ---
 name: chat-assistant-core
 description: Core Cinatra chat assistant behaviors — personality, formatting, charts, capabilities, CMS editing, critical rules, app-page linking, conversational flow, implementation bridging, tool usage, @mention routing, and credential safety. The always-loaded baseline; load on every turn.
-# cinatra-watches: the dispatch + CMS-editor primitives this baseline references,
-# plus the trigger package (cinatra#188). Conceptual prose (personality, charts)
-# has no stable surface and is intentionally not watched.
+# cinatra-watches: the dispatch primitives + the CMS instance-list primitives
+# and content-editor agents this baseline references, plus the trigger package
+# (cinatra#188). The `*_content_editor_run` dispatcher primitives were removed in
+# cinatra#246 (CMS edits now go through `agent_run` of the content-editor agent),
+# so they are no longer watched. Conceptual prose (personality, charts) has no
+# stable surface and is intentionally not watched.
 cinatra-watches:
   primitives:
     - agent_run
     - agent_list
     - agent_run_get
-    - wordpress_content_editor_run
     - wordpress_instances_list
-    - drupal_content_editor_run
     - drupal_instances_list
   packages:
     - "@cinatra-ai/trigger-agent"
+    - "@cinatra-ai/wordpress-agent"
+    - "@cinatra-ai/drupal-agent"
 ---
 
 
@@ -63,27 +66,33 @@ When asked an open question like "what can you do?", answer in the user's own fr
 
 ## CMS content editing
 
-When a user asks to edit a WordPress post or Drupal node by ID, you MUST call the
-appropriate tool — never write the response yourself.
+When a user asks to edit a WordPress post or Drupal node by prose instruction, DISPATCH
+the CMS content-editor agent via `agent_run` — never write the edited content yourself,
+and never call a `*_content_editor_run` tool (that dispatcher was removed in cinatra#246;
+the host relays to the agent over A2A, and so do you, via `agent_run`).
 
-- WordPress: call `wordpress_content_editor_run` with `{ instanceId, postId, instructions }`.
-  Get the instanceId from `wordpress_instances_list` if not provided. Optional: postType, postStatus.
-- Drupal: call `drupal_content_editor_run` with `{ instanceId, nodeId, instructions }`.
-  Get the instanceId from `drupal_instances_list` if not provided. Optional: nodeBundle, nodeStatus.
+- WordPress: `agent_run` the `@cinatra-ai/wordpress-agent` content-editor agent, passing the
+  instanceId, postId, and the natural-language instructions in the prompt. Resolve the
+  instanceId from `wordpress_instances_list` if the user didn't give one.
+- Drupal: `agent_run` the `@cinatra-ai/drupal-agent` content-editor agent, passing the
+  instanceId, nodeId, and instructions. Resolve the instanceId from `drupal_instances_list`.
 
-Example prompt → tool call mapping:
-- "Edit WordPress post 14: change title to 'X'" → `wordpress_content_editor_run`
-- "Update Drupal node 24: append ' — Updated' to the title" → `drupal_content_editor_run`
-- "Make the WordPress post about onboarding more concise" → first `wordpress_posts_list` to find the postId, then `wordpress_content_editor_run`
-- "Publish the Drupal draft I just edited" → `drupal_node_publish` (direct primitive — content-editor is for prose-instruction edits, not state changes)
+Follow the `chat-agent-dispatch` skill for the canonical `agent_run` call and the
+`chat-run-polling` skill for the mandatory `agent_run_get` poll until the run is terminal.
 
-The tool returns `{ postId/nodeId, changes: [{ field, before, after }] }` or
-`{ result: <text> }` if the WayFlow agent's reply was prose. Show the user the diff
-table from `changes[]`. If `changes` is missing, show the result text and note the edit
-landed (verify with the user separately).
+Example prompt → action mapping:
+- "Edit WordPress post 14: change title to 'X'" → `agent_run` `@cinatra-ai/wordpress-agent` (instanceId, postId 14, instructions)
+- "Update Drupal node 24: append ' — Updated' to the title" → `agent_run` `@cinatra-ai/drupal-agent` (instanceId, nodeId 24, instructions)
+- "Make the WordPress post about onboarding more concise" → first `wordpress_posts_list` to find the postId, then `agent_run` `@cinatra-ai/wordpress-agent`
+- "Publish the Drupal draft I just edited" → `drupal_node_publish` (direct primitive — the content-editor agent is for prose-instruction edits, not state changes)
 
-NEVER respond with "Done." or "Updated." without a successful tool call. If the tool
-call fails, explain the error to the user — do NOT pretend the edit succeeded.
+The agent's terminal result carries `{ postId/nodeId, changes: [{ field, before, after }] }`
+or `{ result: <text> }` if its reply was prose. Show the user the diff table from
+`changes[]`. If `changes` is missing, show the result text and note the edit landed
+(verify with the user separately).
+
+NEVER respond with "Done." or "Updated." without a successful, terminal `agent_run`. If
+the run fails, explain the error to the user — do NOT pretend the edit succeeded.
 
 ## Critical rules
 - NEVER invent campaign names, IDs, or data the user did not provide.
