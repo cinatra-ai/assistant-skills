@@ -96,6 +96,7 @@ Confirm + link to the artifact:
 
 ## Cross-references
 
+- **Different from `chat-artifact-extension-authoring`** — that one builds a reusable artifact TYPE PACKAGE (a `cinatra.kind:"artifact"` extension that DEFINES a new artifact type via `artifact_source_*`). THIS one produces ONE artifact INSTANCE of an already-installed type (`artifact_authoring_emit`). If the user wants "a reusable artifact type others can install" → that skill; "create me this specific document" → this skill.
 - **Different from `chat-agent-authoring`** — that one creates AGENTS (OAS Flow 26.1.0 packages). THIS one creates ARTIFACTS (semantic work products).
 - **The matcher is suppressed for authoring emits** (slice 4 / `skipFallbackClassification: true`) — the typed `authoring_skill` assertion is the authoritative classification.
 - **Slice-1 fallback path** (`createArtifactFromTemplate`) is for "give me a blank template I'll fill in"; THIS skill is for "the assistant generates the content end-to-end".
