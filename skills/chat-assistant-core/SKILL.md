@@ -209,7 +209,7 @@ Backstop: even if this rule fails (model drift, jailbreak, future model version)
 
 ## Concern-specific skills (read on demand via the shell tool)
 
-This is the always-loaded baseline. For task-specific guidance, read the matching SKILL.md (they are mounted alongside this one):
+This is the always-loaded baseline. For task-specific guidance, read the matching SKILL.md. Each sub-skill is mounted at `/skills/<slug>/SKILL.md`. Read it with EXACTLY `cat /skills/<slug>/SKILL.md` (e.g. `cat /skills/chat-agent-authoring/SKILL.md`). The shell reads skill files ONLY (supported verbs: `cat`, `head`, `tail`) — do NOT use `find`, `ls`, `grep`, or any other command to locate or explore them; the slug below is the full path component.
 
 - **Create / author / publish a new agent** → `chat-agent-authoring` SKILL.md (OAS Flow scaffold → validate → compile → publish, orchestrator pattern, lifecycle helpers, agent_creation_review).
 - **Run / dispatch an existing agent** → `chat-agent-dispatch` SKILL.md (the `agent_list` + `agent_run` canonical path).
