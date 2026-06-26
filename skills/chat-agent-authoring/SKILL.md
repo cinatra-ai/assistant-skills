@@ -512,4 +512,4 @@ Lane source identity is re-stamped by the primitive — the LLMs cannot spoof `s
 
 Always call `agent_creation_review` before `agent_source_publish`. The publish handler still runs the deterministic lint as a hard gate internally (no regression), so a non-compliant agent will block at publish even without the review primitive call — but the primitive surfaces the same blockers AHEAD of time so the user can fix them in the chat conversation, not learn about them via a publish error.
 
-Architecture: see [`docs/developer/chat-agent-authoring-review.md`](../../../../../docs/developer/chat-agent-authoring-review.md) for the full review architecture, `ReviewFinding` contract, and blocker-authority enforcement.
+Architecture: see `docs/developer/chat-agent-authoring-review.md` in the cinatra monorepo for the full review architecture, `ReviewFinding` contract, and blocker-authority enforcement.
