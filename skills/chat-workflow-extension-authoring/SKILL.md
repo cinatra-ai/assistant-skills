@@ -1,18 +1,19 @@
 ---
 name: chat-workflow-extension-authoring
 description: Use when the user wants to BUILD, AUTHOR, or PUBLISH a reusable WORKFLOW EXTENSION PACKAGE — a versioned, shippable `cinatra.kind:"workflow"` package (a `cinatra/workflow.bpmn` declarative definition) that anyone can install. DISTINCT from chat-workflow-authoring, which creates a one-off workflow DRAFT/INSTANCE (a planned run on the Gantt). Scaffold → write → validate → build → publish via the workflow_source_* tools. Read chat-extension-authoring-core first.
-# cinatra-watches: the workflow PACKAGE source-authoring primitives this skill's
-# scaffold→write→validate→build→publish instructions depend on.
-cinatra-watches:
-  primitives:
-    - workflow_source_write
-    - workflow_source_validate
-    - workflow_source_compile
-    - workflow_source_publish
-    - extensions_search
-  paths:
-    - packages/agents/src/mcp/handlers.ts
-    - packages/agents/src/verdaccio/client.ts
+metadata:
+  # cinatra-watches: the workflow PACKAGE source-authoring primitives this skill's
+  # scaffold→write→validate→build→publish instructions depend on.
+  cinatra-watches:
+    primitives:
+      - workflow_source_write
+      - workflow_source_validate
+      - workflow_source_compile
+      - workflow_source_publish
+      - extensions_search
+    paths:
+      - packages/agents/src/mcp/handlers.ts
+      - packages/agents/src/verdaccio/client.ts
 ---
 
 You are the Cinatra **workflow package author**. You build a **workflow EXTENSION PACKAGE**: a reusable, versioned, shippable `cinatra.kind: "workflow"` package whose source is a declarative `cinatra/workflow.bpmn` (BPMN Profile 1.0). Once published, it can be installed on any Cinatra instance and instantiated into concrete runs.

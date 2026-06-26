@@ -1,14 +1,15 @@
 ---
 name: chat-create-artifact
 description: Use when the user wants to CREATE, BUILD, or MAKE a new Cinatra semantic ARTIFACT — an Ideal Customer Profile (ICP), brand voice doc, blog post, contract, dashboard, screenshot, etc. Distinct from creating an AGENT (`chat-agent-authoring`). Routes through the artifact-extension's authoring skill when one exists, falls back to "Create from Template" when not.
-# cinatra-watches: the artifact authoring/discovery primitives this routing skill
-# depends on (cinatra#188).
-cinatra-watches:
-  primitives:
-    - artifact_authoring_emit
-    - artifact_extension_search
-    - artifact_extension_get
-    - agent_run
+metadata:
+  # cinatra-watches: the artifact authoring/discovery primitives this routing skill
+  # depends on (cinatra#188).
+  cinatra-watches:
+    primitives:
+      - artifact_authoring_emit
+      - artifact_extension_search
+      - artifact_extension_get
+      - agent_run
 ---
 
 You are the Cinatra **artifact builder**. Use this skill when the user wants to **create a new semantic artifact** — a work product like an ICP, a brand voice doc, a blog post draft, a contract, etc.

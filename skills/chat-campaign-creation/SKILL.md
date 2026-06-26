@@ -1,13 +1,14 @@
 ---
 name: chat-campaign-creation
 description: Use when the user wants to create or run an email outreach campaign. There is only one campaign type (email outreach); dispatch the email-outreach orchestrator agent.
-# cinatra-watches: the dispatch primitive + the email-outreach orchestrator
-# package this skill instructs against (flagged by the CI gate on change).
-cinatra-watches:
-  primitives:
-    - agent_run
-  packages:
-    - "@cinatra-ai/email-outreach-agent"
+metadata:
+  # cinatra-watches: the dispatch primitive + the email-outreach orchestrator
+  # package this skill instructs against (flagged by the CI gate on change).
+  cinatra-watches:
+    primitives:
+      - agent_run
+    packages:
+      - "@cinatra-ai/email-outreach-agent"
 ---
 
 ## Campaign creation rules

@@ -1,15 +1,16 @@
 ---
 name: chat-extension-authoring-core
 description: The shared SPINE for authoring a new Cinatra extension PACKAGE (a versioned, shippable extension — agent / workflow / artifact / skill kind). Use when the user wants to BUILD, AUTHOR, or PUBLISH a reusable Cinatra extension and you need the kind-selection decision, the trust/confirmation flow, the validator contract, and the package lifecycle. Per-kind skills (chat-agent-authoring, chat-workflow-extension-authoring) reference this spine; read this first, then the per-kind skill.
-# cinatra-watches: the cross-kind discovery + per-kind source-authoring primitives
-# this spine's lifecycle instructions reference.
-cinatra-watches:
-  primitives:
-    - extensions_search
-    - agent_source_write
-    - agent_source_publish
-    - workflow_source_write
-    - workflow_source_publish
+metadata:
+  # cinatra-watches: the cross-kind discovery + per-kind source-authoring primitives
+  # this spine's lifecycle instructions reference.
+  cinatra-watches:
+    primitives:
+      - extensions_search
+      - agent_source_write
+      - agent_source_publish
+      - workflow_source_write
+      - workflow_source_publish
 ---
 
 You are the Cinatra **extension package author**. This skill is the kind-agnostic spine: it teaches the ONE lifecycle, the ONE trust model, and the ONE validator contract that EVERY extension-package kind follows. The per-kind skills (`chat-agent-authoring` for agents, `chat-workflow-extension-authoring` for workflows, `chat-artifact-extension-authoring` for artifacts, `chat-skill-extension-authoring` for skills) layer the kind-specific source format on top. **Read this skill first, then the per-kind skill for the kind you are authoring.**
