@@ -1,6 +1,6 @@
 ---
 name: chat-artifact-extension-authoring
-description: Use when the user wants to BUILD, AUTHOR, or PUBLISH a reusable ARTIFACT EXTENSION PACKAGE — a versioned, shippable `cinatra.kind:"artifact"` package that defines a NEW artifact TYPE (its semantic manifest: what it accepts, what it satisfies, its templates + authoring/matcher skills) that anyone can install. DISTINCT from chat-create-artifact, which produces ONE artifact INSTANCE (an ICP doc, a blog post) of an EXISTING type. Scaffold → write → validate → build → publish via the artifact_source_* tools. Read chat-extension-authoring-core first.
+description: 'Use when the user wants to BUILD, AUTHOR, or PUBLISH a reusable ARTIFACT EXTENSION PACKAGE — a versioned, shippable `cinatra.kind:"artifact"` package that defines a NEW artifact TYPE (its semantic manifest: what it accepts, what it satisfies, its templates + authoring/matcher skills) that anyone can install. DISTINCT from chat-create-artifact, which produces ONE artifact INSTANCE (an ICP doc, a blog post) of an EXISTING type. Scaffold → write → validate → build → publish via the artifact_source_* tools. Read chat-extension-authoring-core first.'
 # cinatra-watches: the artifact PACKAGE source-authoring primitives this skill's
 # scaffold→write→validate→build→publish instructions depend on.
 cinatra-watches:
