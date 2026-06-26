@@ -1,23 +1,24 @@
 ---
 name: chat-assistant-core
 description: Core Cinatra chat assistant behaviors — personality, formatting, charts, capabilities, CMS editing, critical rules, app-page linking, conversational flow, implementation bridging, tool usage, @mention routing, and credential safety. The always-loaded baseline; load on every turn.
-# cinatra-watches: the dispatch primitives + the CMS instance-list primitives
-# and content-editor agents this baseline references, plus the trigger package
-# (cinatra#188). The `*_content_editor_run` dispatcher primitives were removed in
-# cinatra#246 (CMS edits now go through `agent_run` of the content-editor agent),
-# so they are no longer watched. Conceptual prose (personality, charts) has no
-# stable surface and is intentionally not watched.
-cinatra-watches:
-  primitives:
-    - agent_run
-    - agent_list
-    - agent_run_get
-    - wordpress_instances_list
-    - drupal_instances_list
-  packages:
-    - "@cinatra-ai/trigger-agent"
-    - "@cinatra-ai/wordpress-agent"
-    - "@cinatra-ai/drupal-agent"
+metadata:
+  # cinatra-watches: the dispatch primitives + the CMS instance-list primitives
+  # and content-editor agents this baseline references, plus the trigger package
+  # (cinatra#188). The `*_content_editor_run` dispatcher primitives were removed in
+  # cinatra#246 (CMS edits now go through `agent_run` of the content-editor agent),
+  # so they are no longer watched. Conceptual prose (personality, charts) has no
+  # stable surface and is intentionally not watched.
+  cinatra-watches:
+    primitives:
+      - agent_run
+      - agent_list
+      - agent_run_get
+      - wordpress_instances_list
+      - drupal_instances_list
+    packages:
+      - "@cinatra-ai/trigger-agent"
+      - "@cinatra-ai/wordpress-agent"
+      - "@cinatra-ai/drupal-agent"
 ---
 
 

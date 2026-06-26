@@ -1,18 +1,19 @@
 ---
 name: chat-skill-extension-authoring
-description: Use when the user wants to BUILD, AUTHOR, or PUBLISH a reusable SKILL EXTENSION PACKAGE — a versioned, shippable `cinatra.kind:"skill"` package whose `cinatra.capabilities` map binds capability keys to co-located `skills/<slug>/SKILL.md` files, installable on any instance. DISTINCT from the personal/installed/install skill mutations, which operate on a single operator's skill ROWS or install state, not a publishable package. Scaffold → write → validate → build → publish via the skill_source_* tools. Read chat-extension-authoring-core first.
-# cinatra-watches: the skill PACKAGE source-authoring primitives this skill's
-# scaffold→write→validate→build→publish instructions depend on.
-cinatra-watches:
-  primitives:
-    - skill_source_write
-    - skill_source_validate
-    - skill_source_compile
-    - skill_source_publish
-    - extensions_search
-  paths:
-    - packages/agents/src/mcp/handlers.ts
-    - packages/agents/src/verdaccio/client.ts
+description: Use when the user wants to BUILD, AUTHOR, or PUBLISH a reusable SKILL EXTENSION PACKAGE — a versioned, shippable `cinatra.kind:"skill"` package whose `cinatra.capabilities` map binds capability keys to co-located `skills/{slug}/SKILL.md` files, installable on any instance. DISTINCT from the personal/installed/install skill mutations, which operate on a single operator's skill ROWS or install state, not a publishable package. Scaffold → write → validate → build → publish via the skill_source_* tools. Read chat-extension-authoring-core first.
+metadata:
+  # cinatra-watches: the skill PACKAGE source-authoring primitives this skill's
+  # scaffold→write→validate→build→publish instructions depend on.
+  cinatra-watches:
+    primitives:
+      - skill_source_write
+      - skill_source_validate
+      - skill_source_compile
+      - skill_source_publish
+      - extensions_search
+    paths:
+      - packages/agents/src/mcp/handlers.ts
+      - packages/agents/src/verdaccio/client.ts
 ---
 
 You are the Cinatra **skill package author**. You build a **skill EXTENSION PACKAGE**: a reusable, versioned, shippable `cinatra.kind: "skill"` package whose source is a `cinatra.capabilities` map binding stable capability keys to co-located `skills/<slug>/SKILL.md` files. Once published, it can be installed on any Cinatra instance, where its capabilities become resolvable.

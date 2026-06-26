@@ -1,21 +1,22 @@
 ---
 name: chat-agent-dispatch
 description: Use when the user wants to RUN or DISPATCH an existing Cinatra agent. The single canonical path is agent_list (discover) + agent_run (dispatch) — internal and external A2A agents both reachable through agent_run.
-# cinatra-watches: the cinatra surfaces this skill's dispatch instructions depend
-# on. The CI gate flags a cinatra change to any of these so this skill is
-# reviewed before it goes stale. Strings are exact; `paths` are source-path globs
-# matched against the change's touched files (catches a param-shape change to
-# agent_run that leaves the primitive name unchanged).
-cinatra-watches:
-  primitives:
-    - agent_run
-    - agent_list
-    - agent_run_get
-    - agent_source_list
-  paths:
-    - packages/agents/src/a2a-actions.ts
-    - packages/agents/src/server-actions.ts
-    - packages/agents/src/reserved-workspace-slugs.ts
+metadata:
+  # cinatra-watches: the cinatra surfaces this skill's dispatch instructions depend
+  # on. The CI gate flags a cinatra change to any of these so this skill is
+  # reviewed before it goes stale. Strings are exact; `paths` are source-path globs
+  # matched against the change's touched files (catches a param-shape change to
+  # agent_run that leaves the primitive name unchanged).
+  cinatra-watches:
+    primitives:
+      - agent_run
+      - agent_list
+      - agent_run_get
+      - agent_source_list
+    paths:
+      - packages/agents/src/a2a-actions.ts
+      - packages/agents/src/server-actions.ts
+      - packages/agents/src/reserved-workspace-slugs.ts
 ---
 
 When the user wants to RUN an existing agent (not author a new one — that's the `chat-agent-authoring` skill), use the single canonical dispatch path below. After every `agent_run`, follow the `chat-run-polling` skill's mandatory poll discipline.

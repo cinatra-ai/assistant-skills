@@ -1,14 +1,15 @@
 ---
 name: create-campaign
 description: Use when the user wants to create a new outreach campaign, build a cold email sequence, or set up automated email outreach.
-# cinatra-watches: the campaign-create primitive base and the canonical
-# email-outreach agent workspace route this skill hands off to (cinatra#188). If
-# that route is renamed the hand-off instruction goes stale.
-cinatra-watches:
-  primitives:
-    - email_outreach
-  routes:
-    - /agents/cinatra-agents/email-outreach/new
+metadata:
+  # cinatra-watches: the campaign-create primitive base and the canonical
+  # email-outreach agent workspace route this skill hands off to (cinatra#188). If
+  # that route is renamed the hand-off instruction goes stale.
+  cinatra-watches:
+    primitives:
+      - email_outreach
+    routes:
+      - /agents/cinatra-agents/email-outreach/new
 ---
 
 # Create Campaign
