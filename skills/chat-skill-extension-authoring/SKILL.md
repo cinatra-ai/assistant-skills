@@ -81,7 +81,7 @@ Call `skill_source_write` ONCE with:
 - `skillMd` — the `SKILL.md` content (frontmatter `name` required).
 - `skillSlug` — optional skill-directory name under `skills/` (defaults to `packageSlug`).
 
-The handler **validates the SKILL.md frontmatter before writing** — a `SKILL.md` with no frontmatter `name` is rejected and nothing lands on disk. It rescopes `package.json#name` to `@<vendorName>/<slug>` and returns `{ written, kind: "skill", paths, nameNormalized?, cinatraNormalized? }`. A literal credential in any file returns `{ error, code: "review_blocked", blockers[] }` — surface it; move secrets to `/settings/connections`.
+The handler **validates the SKILL.md frontmatter before writing** — a `SKILL.md` with no frontmatter `name` is rejected and nothing lands on disk. It rescopes `package.json#name` to `@<vendorName>/<slug>` and returns `{ written, kind: "skill", paths, nameNormalized?, cinatraNormalized? }`. A literal credential in any file returns `{ error, code: "review_blocked", blockers[] }` — surface it; move secrets to `/connectors`.
 
 ## Step 4 — Write the SKILL.md
 

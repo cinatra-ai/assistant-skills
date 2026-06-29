@@ -81,7 +81,7 @@ Call `workflow_source_write` ONCE with:
 - `workflowBpmn` — the BPMN XML string (Step 4).
 - `skillMd` — optional usage notes.
 
-The handler **validates the BPMN before writing** — a structurally-invalid workflow is rejected and nothing lands on disk. It rescopes `package.json#name` to `@<vendorName>/<slug>` and returns `{ written, kind: "workflow", paths, nameNormalized?, cinatraNormalized? }`. A literal credential in any file returns `{ error, code: "review_blocked", blockers[] }` — surface it; move secrets to `/settings/connections`.
+The handler **validates the BPMN before writing** — a structurally-invalid workflow is rejected and nothing lands on disk. It rescopes `package.json#name` to `@<vendorName>/<slug>` and returns `{ written, kind: "workflow", paths, nameNormalized?, cinatraNormalized? }`. A literal credential in any file returns `{ error, code: "review_blocked", blockers[] }` — surface it; move secrets to `/connectors`.
 
 ## Step 4 — Write the workflow.bpmn (BPMN Profile 1.0)
 

@@ -82,7 +82,7 @@ Every kind walks the SAME six-stage spine. The tool NAMES differ per kind (`agen
 ## The validator contract (shared)
 
 - `*_source_validate` is **read-only** and the authority for "is this package structurally shippable". It returns `{ valid: boolean, errors: string[] }` (human-readable error strings).
-- A **blocker** (e.g. a literal credential detected in package files) returns a structured `{ error, code: "review_blocked", blockers[] }` shape from the write/compile tools — surface every blocker to the user and do NOT proceed until resolved. Credentials never belong in package files; move them to `/settings/connections` (Nango).
+- A **blocker** (e.g. a literal credential detected in package files) returns a structured `{ error, code: "review_blocked", blockers[] }` shape from the write/compile tools — surface every blocker to the user and do NOT proceed until resolved. Credentials never belong in package files; move them to `/connectors` (Nango).
 - The publish handler re-runs the validation gate independently, so a non-compliant package blocks at publish even if validation was skipped — but always validate ahead of time so the user fixes issues in chat, not via a publish error.
 
 ## Absolute rules (every kind)
