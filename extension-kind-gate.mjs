@@ -533,6 +533,112 @@ export function scanHostPeerValueImports(packageRoot, pkg, entryAbs) {
   return [...hits].sort();
 }
 
+// ===========================================================================
+// Dead app-route guard.
+//
+// Skill/README/authoring content frequently links the user to a Cinatra app
+// route (e.g. "[Open settings](/settings)"). When the app renames or removes a
+// route, those links rot silently — the assistant then sends users to a 404.
+// This guard fails the gate on any reference to a KNOWN-DEAD top-level app
+// route in a markdown file, with the live replacement, so a new (or stale)
+// skill that names a dead route cannot pass CI.
+//
+// Grounded against the cinatra app router (src/app/*) — only routes verified
+// REMOVED are listed; live routes (e.g. /workflows, which still exists) are
+// deliberately NOT listed to avoid false failures. Each entry matches a
+// route-shaped reference (start-of-line or a markdown/string/bracket delimiter
+// before it; a non-path terminator after it) so it does not fire on a legit
+// nested route such as /teams/{teamId}/settings or on /settings/connections,
+// which has its own (more specific) rule. Matches inside fenced code blocks are
+// skipped (illustrative, not live links); backticked inline references DO fire.
+//
+// The prefix also catches an ABSOLUTE cinatra app URL (e.g.
+// https://app.cinatra.ai/settings) — a delimiter alone would miss it because a
+// hostname char sits right before the path. To avoid flagging unrelated
+// third-party URLs that merely share a path, the host form is scoped to a
+// cinatra app host (…cinatra.ai or …cinatra.app, optionally with a subdomain).
+// The host is LEFT-BOUNDED (`//`, `@`, or a label-dot before the cinatra label)
+// so a look-alike like `evilcinatra.ai` does NOT match, and an optional `:port`
+// is tolerated (e.g. https://cinatra.ai:443/settings). Out of scope (rare in
+// skill prose, and adding them risks false-positives): routes that live in a
+// URL query (`?next=/settings`) or fragment (`#/settings`) — the assistant
+// surfaces a bare path or an absolute app URL, not a re-encoded one.
+// ===========================================================================
+const CINATRA_HOST = String.raw`(?:/{2}|@|[A-Za-z0-9-]+\.)(?:[A-Za-z0-9-]+\.)*cinatra\.(?:ai|app)(?::\d+)?`;
+const ROUTE_PREFIX = String.raw`(?:^|[\s([{"'\`<]|${CINATRA_HOST})`;
+// Terminator AFTER the route: end, whitespace, or a delimiter — but for the
+// bare /settings rule, a following "/" is NOT allowed (so /settings/connections
+// is only reported by its own, more specific rule, never duplicated here).
+const ROUTE_END_NO_SLASH = String.raw`(?=$|[\s)\]}'"\`>,.;:!?#])`;
+const ROUTE_END_WITH_SLASH = String.raw`(?=$|[/?#\s)\]}'"\`>,.;:!?])`;
+
+export const DEAD_APP_ROUTES = [
+  { route: "/settings/connections", replacement: "/connectors", pattern: new RegExp(`${ROUTE_PREFIX}(/settings/connections)${ROUTE_END_WITH_SLASH}`, "g") },
+  { route: "/settings", replacement: "/account", pattern: new RegExp(`${ROUTE_PREFIX}(/settings)${ROUTE_END_NO_SLASH}`, "g") },
+  { route: "/agents/registry", replacement: "/configuration/marketplace", pattern: new RegExp(`${ROUTE_PREFIX}(/agents/registry)${ROUTE_END_WITH_SLASH}`, "g") },
+];
+
+/** Yield checkable markdown lines (outside fenced code blocks) as
+ * { lineno, text } from `rawText`. Inline `code spans` are kept — a backticked
+ * dead route is still a dead route the assistant will surface. */
+export function* iterMarkdownLines(rawText) {
+  let inFence = false;
+  let lineno = 0;
+  for (const raw of rawText.split(/\r?\n/)) {
+    lineno += 1;
+    const t = raw.trimStart();
+    if (t.startsWith("```") || t.startsWith("~~~")) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
+    yield { lineno, text: raw };
+  }
+}
+
+/** Walk `.md` files under `dir`, skipping vendor/build dirs. */
+function walkMarkdownFiles(dir, acc = []) {
+  let entries;
+  try {
+    entries = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return acc;
+  }
+  for (const e of entries) {
+    if (e.name === "node_modules" || e.name === ".git") continue;
+    if (["dist", "build", ".next", "coverage"].includes(e.name)) continue;
+    const full = join(dir, e.name);
+    if (e.isDirectory()) walkMarkdownFiles(full, acc);
+    else if (/\.md$/i.test(e.name)) acc.push(full);
+  }
+  return acc;
+}
+
+/** Scan every markdown file under `packageRoot` for references to a known-dead
+ * app route. Returns an array of human-readable error strings (file:line + the
+ * live replacement). Self-contained; no host dependency. */
+export function validateNoDeadAppRoutes(packageRoot) {
+  const errors = [];
+  for (const file of walkMarkdownFiles(packageRoot)) {
+    let raw;
+    try {
+      raw = readFileSync(file, "utf8");
+    } catch {
+      continue;
+    }
+    const rel = relative(packageRoot, file) || basename(file);
+    for (const { lineno, text } of iterMarkdownLines(raw)) {
+      for (const { route, replacement, pattern } of DEAD_APP_ROUTES) {
+        pattern.lastIndex = 0;
+        if (pattern.test(text)) {
+          errors.push(`${rel}:${lineno} references dead app route ${route} — use ${replacement} (the route was renamed/removed in the cinatra app)`);
+        }
+      }
+    }
+  }
+  return errors;
+}
+
 /** The common (all-kinds) validation. Returns { errors:[], warnings:[] }. */
 export function validateCommon(packageRoot) {
   const errors = [];
@@ -694,6 +800,9 @@ export function validateCommon(packageRoot) {
   // ---- 8. README + license ----
   errors.push(...validateReadmePresence(packageRoot, cinatra.kind));
   errors.push(...validateLicensePresence(pkg, warnings));
+
+  // ---- dead app-route guard (all kinds) ----
+  errors.push(...validateNoDeadAppRoutes(packageRoot));
 
   return { errors, warnings };
 }
