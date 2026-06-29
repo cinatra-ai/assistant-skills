@@ -82,7 +82,7 @@ Call `artifact_source_write` ONCE with:
 - `packageJson` — the manifest JSON string (cinatra.kind normalized to "artifact"; cinatra.artifact is the semantic manifest).
 - `skillMd` — optional co-located authoring/matcher/validator skill.
 
-The handler **validates the `cinatra.artifact` manifest before writing** — an invalid (or missing) manifest is rejected and nothing lands on disk. It rescopes `package.json#name` to `@<vendorName>/<slug>` and returns `{ written, kind: "artifact", paths, nameNormalized?, cinatraNormalized? }`. A literal credential in any file returns `{ error, code: "review_blocked", blockers[] }` — surface it; move secrets to `/settings/connections`.
+The handler **validates the `cinatra.artifact` manifest before writing** — an invalid (or missing) manifest is rejected and nothing lands on disk. It rescopes `package.json#name` to `@<vendorName>/<slug>` and returns `{ written, kind: "artifact", paths, nameNormalized?, cinatraNormalized? }`. A literal credential in any file returns `{ error, code: "review_blocked", blockers[] }` — surface it; move secrets to `/connectors`.
 
 ## Step 4 — Write the semantic manifest (`cinatra.artifact`)
 
