@@ -23,15 +23,16 @@ When the user wants to RUN an existing agent (not author a new one — that's th
 
 ## Mandatory dispatch trigger
 
-If the latest user message explicitly asks to **use**, **run**, **invoke**, **call**, or **dispatch** an existing agent, OR names an installed agent package such as `@cinatra-ai/<slug>`, your **first external action MUST be `agent_run`**.
+If the latest user message explicitly asks to **use**, **run**, **invoke**, **call**, or **dispatch** an existing agent, OR names an agent package such as `@cinatra-ai/<slug>` **as the target of a run request**, your **first external action MUST be `agent_run`**. (A package name in an availability/installability question — "is `@cinatra-ai/<slug>` installable", "do you have `@cinatra-ai/<slug>`" — is NOT a run request: that is a discovery question; see the discovery carve-out below.)
 
 Rules:
-- If the prompt contains an exact package name like `@cinatra-ai/email-test-delivery-agent`, call `agent_run` with `packageName` immediately. Do NOT call `agent_list` first.
+- If the prompt asks to run/use a package by an exact name like `@cinatra-ai/email-test-delivery-agent`, call `agent_run` with `packageName` immediately. Do NOT call `agent_list` first. (If the same name appears in an "is it installable / available" question, treat it as discovery, not dispatch — see below.)
 - Do NOT explain what the agent does before dispatching. Do NOT ask for confirmation unless the user is only asking about the agent rather than asking to run it.
 - Pass `inputParams` as a JSON string using values already present in the prompt. If no structured input is obvious, pass `"{}"` and let the agent setup/HITL flow collect missing values.
 - After `agent_run` returns `{ runId, status: "queued" }`, call `agent_run_get` until the run reaches `completed`, `failed`, `pending_approval`, or `stopped` (see the `chat-run-polling` skill).
 - Legacy prompt wording like `cinatra_trigger-agent tool` means the package `@cinatra-ai/trigger-agent`; dispatch with `agent_run`, NOT a retired per-agent function tool (those were removed).
 - If the user asks to compare, list, describe, or find agents and does NOT ask to run one, do not dispatch. Use `agent_list` first.
+- If the user asks what is AVAILABLE or INSTALLABLE (not which installed agent to run) — "what can I install", "is there a `<X>` agent", "find me a package that…", "is `@cinatra-ai/<slug>` installable" — this is a **discovery** question, not a dispatch one. Read `chat-extension-discovery` and climb the full ladder. Do NOT answer "no such agent exists" from `agent_list` alone: `agent_list` shows only installed/saved agents, not the public registry (`extensions_search`), so an empty `agent_list` is never proof a package does not exist.
 
 Few-shot examples (covering the canonical prompt shapes):
 
@@ -46,6 +47,9 @@ Few-shot examples (covering the canonical prompt shapes):
 
 - User: `Which agent can scrape a web page?`
   First action: `agent_list({ "query": "scrape" })` (this is asking ABOUT agents, not asking to run one)
+
+- User: `Is there a blog agent I can install?` / `What can I install?`
+  Action: this is an availability/installability question — read `chat-extension-discovery` and climb the discovery ladder (do not stop at `agent_list`; an empty local list is not proof the package does not exist on the public registry).
 
 ## Dispatch hierarchy (single canonical path)
 
