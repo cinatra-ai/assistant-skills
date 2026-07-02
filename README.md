@@ -6,9 +6,9 @@ No credentials are required. Register the bundle from admin → Settings → Ski
 
 **Example:** Ask "Research ACME Corp and find the VP of Engineering." The skill enriches contacts and returns a decision-maker table with ICP-fit scores. Missing agents are named with a marketplace link; credential errors surface as a named reason, not a silent empty result.
 
-**Development:** Skills live under `skills/<slug>/SKILL.md` as capability bindings. Register each key in `package.json#cinatra.capabilities` and validate with `node extension-kind-gate.mjs` before publishing.
+**Development:** `skills/<slug>/SKILL.md` is enough here. The host derives `@cinatra-ai/chat:<slug>` from the directory; no `cinatra.capabilities` map to edit. Validate with `node extension-kind-gate.mjs` before publishing.
 
-**Troubleshooting:** If the assistant ignores a skill, confirm the bundle is installed and the capability key matches `package.json`. For stalled async runs, check the run ID with `agent_run_get`.
+**Troubleshooting:** If the assistant ignores a skill, confirm the bundle is installed and `skills/<slug>/SKILL.md` exists. Its ID is `@cinatra-ai/chat:<slug>`; no capabilities map to check. For stalled runs, check the run ID with `agent_run_get`.
 
 ## Works with
 
