@@ -112,7 +112,6 @@ Here is the smallest possible valid leaf (a `"node"`-type agent that prompts the
     "cinatra": {
       "type": "node",
       "packageName": "@<vendor>/<slug>",
-      "packageVersion": "0.1.0",
       "hitlScreens": []
     }
   },
