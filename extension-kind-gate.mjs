@@ -576,6 +576,14 @@ export const DEAD_APP_ROUTES = [
   { route: "/settings/connections", replacement: "/connectors", pattern: new RegExp(`${ROUTE_PREFIX}(/settings/connections)${ROUTE_END_WITH_SLASH}`, "g") },
   { route: "/settings", replacement: "/account", pattern: new RegExp(`${ROUTE_PREFIX}(/settings)${ROUTE_END_NO_SLASH}`, "g") },
   { route: "/agents/registry", replacement: "/configuration/marketplace", pattern: new RegExp(`${ROUTE_PREFIX}(/agents/registry)${ROUTE_END_WITH_SLASH}`, "g") },
+  // The standalone run-agent picker page was removed (not redirected, by
+  // design — cinatra-ai/cinatra#1007): the picker now lives on the /agents
+  // "All Agents" tab. WITH_SLASH deliberately covers the removed page's whole
+  // subtree. The dynamic /agents/<vendor>/<slug>/<instanceId> routes stay
+  // live and would collide only if a vendor were literally named "run" —
+  // no cinatra vendor is (vendors are npm-scope-shaped names such as
+  // cinatra-ai); narrow this rule to NO_SLASH if one ever appears.
+  { route: "/agents/run", replacement: "/agents", pattern: new RegExp(`${ROUTE_PREFIX}(/agents/run)${ROUTE_END_WITH_SLASH}`, "g") },
 ];
 
 /** Yield checkable markdown lines (outside fenced code blocks) as

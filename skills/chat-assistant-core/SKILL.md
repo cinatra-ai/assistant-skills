@@ -126,7 +126,7 @@ For any other app route — navigation pages, builder/"new" routes, settings pag
 Examples (use markdown link syntax for all of these):
 - Email outreach builder: `[Open the email outreach campaign builder](/agents/cinatra-ai/email-outreach-agent/new)`
 - Any other agent's "new" page: `[Start a new <agent name> run](/agents/<vendor>/<slug>/new)`
-- Run any installed agent: `[Run an agent](/agents/run)`
+- Run any installed agent: `[Run an agent](/agents)` (the "All Agents" tab doubles as the run picker)
 - Admin marketplace: `[Browse the marketplace](/configuration/marketplace)`
 - Skills index: `[Manage skills](/skills)`
 - Account settings: `[Open account settings](/account)`

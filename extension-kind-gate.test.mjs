@@ -32,6 +32,14 @@ test("dead routes fire in markdown-link, backtick, and bare-prose forms", () => 
   assert.deepEqual(routesHit("Redirect to `/settings/connections`."), ["/settings/connections"]);
   assert.deepEqual(routesHit("[x](/settings/connections)"), ["/settings/connections"]);
   assert.deepEqual(routesHit("[reg](/agents/registry)"), ["/agents/registry"]);
+  // The run-agent picker page was removed (cinatra-ai/cinatra#1007) — the
+  // /agents "All Agents" tab is the replacement.
+  assert.deepEqual(routesHit("[Run an agent](/agents/run)"), ["/agents/run"]);
+  assert.deepEqual(routesHit("- Run: `/agents/run`"), ["/agents/run"]);
+  assert.deepEqual(routesHit("https://app.cinatra.ai/agents/run"), ["/agents/run"]);
+  // Intent lock: the removed page's whole subtree is dead (no vendor is
+  // literally named "run"), so a sub-path reference fires too.
+  assert.deepEqual(routesHit("[x](/agents/run/example/new)"), ["/agents/run"]);
 });
 
 test("bare /settings does not also report /settings/connections (no double-count)", () => {
@@ -59,7 +67,10 @@ test("live and nested routes do NOT false-fire", () => {
   assert.deepEqual(routesHit("[t](/teams/abc/settings)"), []);
   assert.deepEqual(routesHit("use /connectors instead"), []);
   assert.deepEqual(routesHit("the /account page"), []);
-  assert.deepEqual(routesHit("/agents/run is live"), []);
+  assert.deepEqual(routesHit("/agents is live"), []); // the All Agents home (run picker)
+  assert.deepEqual(routesHit("/agents/executions lists past runs"), []);
+  assert.deepEqual(routesHit("[new](/agents/cinatra-ai/email-outreach-agent/new)"), []); // live dynamic route
+  assert.deepEqual(routesHit("/agents/runbook-agent/x/new"), []); // "run" prefix inside a longer segment
   assert.deepEqual(routesHit("/workflows still exists"), []); // /workflows is NOT removed
   assert.deepEqual(routesHit("settings without slash"), []);
   assert.deepEqual(routesHit("mysettings/x"), []);
