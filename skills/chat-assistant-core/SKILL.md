@@ -3,11 +3,13 @@ name: chat-assistant-core
 description: Core Cinatra chat assistant behaviors — personality, formatting, charts, capabilities, CMS editing, critical rules, app-page linking, conversational flow, implementation bridging, tool usage, @mention routing, and credential safety. The always-loaded baseline; load on every turn.
 metadata:
   # cinatra-watches: the dispatch primitives + the CMS instance-list primitives
-  # and content-editor agents this baseline references, plus the trigger package
-  # (cinatra#188). The `*_content_editor_run` dispatcher primitives were removed in
-  # cinatra#246 (CMS edits now go through `agent_run` of the content-editor agent),
-  # so they are no longer watched. Conceptual prose (personality, charts) has no
-  # stable surface and is intentionally not watched.
+  # and content-editor agents this baseline references. The `*_content_editor_run`
+  # dispatcher primitives were removed in cinatra#246 (CMS edits now go through
+  # `agent_run` of the content-editor agent), so they are no longer watched; the
+  # @cinatra-ai/trigger-agent package was retired in cinatra#1034 (scheduling is
+  # now a platform default — the host scheduling gate + /trigger tab), so it is no
+  # longer watched either. Conceptual prose (personality, charts) has no stable
+  # surface and is intentionally not watched.
   cinatra-watches:
     primitives:
       - agent_run
@@ -16,7 +18,6 @@ metadata:
       - wordpress_instances_list
       - drupal_instances_list
     packages:
-      - "@cinatra-ai/trigger-agent"
       - "@cinatra-ai/wordpress-agent"
       - "@cinatra-ai/drupal-agent"
 ---
@@ -164,7 +165,7 @@ When the latest user message explicitly asks to **use**, **run**, **invoke**, **
 - When the intent is to run/dispatch, pass `packageName` directly when the package name is present in the prompt; do not call `agent_list` first.
 - Pass any obvious prompt inputs as `inputParams` (stringified JSON). If no structured input is obvious, pass `"{}"` and let the agent's setup/HITL flow collect missing values.
 - After `agent_run` returns `{ runId, status: "queued" }`, follow with `agent_run_get` polling until the run reaches a terminal state (see the `chat-run-polling` skill).
-- Legacy prompt wording like `cinatra_<slug>` (e.g. "Invoke the cinatra_trigger-agent tool") means the package `@cinatra-ai/<slug>` (e.g. `@cinatra-ai/trigger-agent`); dispatch via `agent_run`, not a retired per-agent function tool.
+- Legacy prompt wording like `cinatra_<slug>` (e.g. "Invoke the cinatra_web-research-agent tool") means the package `@cinatra-ai/<slug>` (e.g. `@cinatra-ai/web-research-agent`); dispatch via `agent_run`, not a retired per-agent function tool.
 
 Do **not** dispatch when the user is only asking about an agent, comparing agents, or asking whether an agent exists or can be installed. If the user is asking whether something EXISTS or is INSTALLABLE (not asking to run it), that is a **discovery** question — read `chat-extension-discovery` and climb the full ladder; do NOT answer "none exist" from `agent_list` alone. Otherwise use `agent_list` or answer normally.
 
