@@ -1,30 +1,29 @@
-# Triggers, lifecycle helpers, speed, and marketplace — chat-agent-authoring
+# Triggers, lifecycle ownership, speed, and marketplace — chat-agent-authoring
 
 Read `../SKILL.md` first. This covers the post-core authoring steps: trigger setup,
-lifecycle-helper composition, the speed-optimization checklist, and the marketplace
+core lifecycle ownership, the speed-optimization checklist, and the marketplace
 post-publish share step.
 
 ## Step 7 — Trigger setup (if the user wants scheduling)
 
-When the user mentions "every Monday", "tonight at 6", "once a week", "after the demo", etc., you need to configure a trigger. Two paths:
+When the user mentions "every Monday", "tonight at 6", "once a week", "after the demo", etc., you need to configure a trigger. Scheduling is a platform mechanism — do not wire a trigger step of your own into the workflow:
 
-- **Quick path:** call `agent_run_trigger_set` directly with the runId from `agent_run` and a trigger config: `{ type: "scheduled", scheduledAt: "<ISO>", timezone: "<IANA>" }` or `{ type: "recurring", cronExpression: "0 9 * * MON", timezone: "America/Chicago" }`.
-- **Interactive path:** wire `cinatra_trigger-agent` as the FIRST node of the workflow. It pauses on a HITL surface that lets the user pick the trigger type, then persists it via `agent_run_trigger_set` automatically.
+- Call `agent_run_trigger_set` with the runId from `agent_run` and a trigger config: `{ type: "scheduled", scheduledAt: "<ISO>", timezone: "<IANA>" }` or `{ type: "recurring", cronExpression: "0 9 * * MON", timezone: "America/Chicago" }`.
+- When the schedule is not unambiguous in the request, confirm the trigger type, the instant or cron expression, and the IANA timezone with the user in chat *before* that call rather than guessing.
 
-Use the interactive path whenever the user is unsure or wants to choose; quick path when the schedule is unambiguous in the request.
+Once a trigger is set the host holds the run at its trigger gate until release, and the run's persistent Trigger tab is where the user reviews or cancels an armed trigger (release-now is admin-only).
 
-## Step 8 — Lifecycle helper agents (compose, don't reinvent)
+## Step 8 — Lifecycle concerns (don't reinvent what core owns)
 
-Cinatra ships reusable lifecycle helper agents. ALWAYS prefer composing one of these over inlining the same behaviour into a new agent:
+Skill recommendation, human approval of produced content, and scheduling are **core lifecycle mechanisms**, not behaviours to compose an agent for. Never wire one of these into a new agent or declare one as an agent dependency:
 
-| Helper | When to compose it |
-|--------|---------------------|
-| `cinatra_skill-recommender-agent` | Before an LLM-heavy step (drafting, generation), if the parent agent should let the user toggle which installed skills apply. |
-| `cinatra_trigger-agent` | When the agent should fire on a schedule the user picks interactively. |
+| Concern | What owns it |
+|---------|--------------|
+| Which installed skills apply to a run | The core recommendation checkpoint, evaluated at run start — whether it fires is decided by the policy lattice, not by agent wiring, so a producing agent never composes its own recommender. |
+| Human approval of generated content | The core review checkpoint on the artifact lifecycle, fired by the review policy rather than by agent wiring, so a producing agent never composes its own reviewer to gate its own output. |
+| Firing on a schedule the user picks | The platform trigger mechanism — `agent_run_trigger_set` plus the host trigger gate and the run's Trigger tab (Step 7). |
 
-Human approval of generated content is deliberately absent from that table: the platform runs review as a core checkpoint on the artifact lifecycle, fired by the review policy rather than by agent wiring, so a producing agent never composes its own reviewer to gate its own output.
-
-Add the helper to `metadata.cinatra.agentDependencies` in `package.json`, list its renderer ID in the orchestrator's `metadata.cinatra.hitlScreens`, and reference it as a sub-agent inside `$referenced_components`.
+Composing a sub-agent is still the right move when the sub-agent does real domain work. In that case use the orchestrator FlowNode/subflow pattern in `oas-authoring.md`: add the sub-agent to `cinatra.agentDependencies` in `package.json`, list any renderer ID it contributes in the orchestrator's `metadata.cinatra.hitlScreens`, and reference it inside `$referenced_components`.
 
 ## Step 8.5 — Speed-optimization checklist
 
@@ -32,7 +31,7 @@ Before publishing, audit the OAS for these patterns. Each is a latency/cost tax 
 
 **A. Deterministic-dispatch wrapped in `/api/llm-bridge` is the #1 latency killer.**
 
-Any ApiNode whose `data.system` reads like *"You are the X agent. CRITICAL: Your first and only action is to parse <input> and call <one MCP tool> EXACTLY ONCE"* is paying a ~15k token LLM round-trip (full MCP tool catalog injected on every dispatch) for a task with zero reasoning. Trigger-agent's `persist` node was the canonical example before the passthrough route existed: `gpt-5.5, 15,526 input tokens, 5-30s tail, $0.015/call` for what is structurally `trigger_config_set(args)`.
+Any ApiNode whose `data.system` reads like *"You are the X agent. CRITICAL: Your first and only action is to parse <input> and call <one MCP tool> EXACTLY ONCE"* is paying a ~15k token LLM round-trip (full MCP tool catalog injected on every dispatch) for a task with zero reasoning. The canonical example, before the passthrough route existed, was a trigger-configuration `persist` node whose entire job was to parse a `userResponse` and hand it to `trigger_config_set`: `gpt-5.5, 15,526 input tokens, 5-30s tail, $0.015/call` for what is structurally `trigger_config_set(args)`.
 
 **Fix:** route the ApiNode at `{{CINATRA_BASE_URL}}/api/agents/passthrough` instead of `/api/llm-bridge`. The passthrough route accepts `{ tool, input, agent_run_id }`, resolves the actor via the run row, and dispatches directly to the cinatra MCP primitive handler in-process. Bypass: zero LLM cost, sub-second latency.
 
@@ -58,7 +57,7 @@ Don't over-declare outputs the EndNode won't consume — extra `outputs[]` entri
 
 **E. Composability before authoring.**
 
-Re-using lifecycle helpers (`@cinatra-ai/skill-recommender-agent`, `@cinatra-ai/trigger-agent`) via A2A is cheaper than re-implementing in a new agent — the helpers' performance fixes propagate automatically. Review is not on that list: it is a core lifecycle checkpoint, so dispatching an agent to approve your own output adds a whole sub-run of latency for a gate the platform already owns and fires by policy.
+Re-using an agent that already ships (the reference packages in `../SKILL.md` Step 1) as a `FlowNode` subflow — never `A2AAgent`, which `oas-authoring.md` blocks for internal composition — is cheaper than re-implementing its behaviour in a new agent, and that agent's performance fixes then propagate automatically. Review and skill recommendation are not on that list: both are core lifecycle checkpoints, so dispatching an agent to approve your own output or to pick its own skills adds a whole sub-run of latency for a gate the platform already owns and fires by policy.
 
 ## Step 10 — Offer to share on the marketplace (only after authoring a NEW agent)
 

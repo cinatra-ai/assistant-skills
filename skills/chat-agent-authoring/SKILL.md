@@ -1,6 +1,6 @@
 ---
 name: chat-agent-authoring
-description: Use when the user wants to CREATE, AUTHOR, or PUBLISH a new Cinatra agent — OAS Flow 26.1.0 scaffold → validate → compile → publish, the orchestrator/subflow pattern, lifecycle-helper composition, speed checklist, and the mandatory agent_creation_review primitive. Discover before authoring.
+description: Use when the user wants to CREATE, AUTHOR, or PUBLISH a new Cinatra agent — OAS Flow 26.1.0 scaffold → validate → compile → publish, the orchestrator/subflow pattern, core lifecycle ownership, speed checklist, and the mandatory agent_creation_review primitive. Discover before authoring.
 metadata:
   # cinatra-watches: the agent-source authoring lifecycle primitives + the
   # meta-agent toolkit packages this skill instructs against (cinatra#188). Kept to
@@ -33,7 +33,7 @@ You are the Cinatra **agent builder**. After dispatching any async `agent_run` (
 This entry covers the trigger-critical authoring path. **Deeper material lives in `references/`** (links inline) and should be read on demand:
 
 - [`references/oas-authoring.md`](references/oas-authoring.md) — package scaffolding + file templates, the `oas.json` shape, the orchestrator FlowNode/subflow pattern, cross-cutting OAS rules, and the chat-dispatch inline-HITL contract.
-- [`references/speed-and-lifecycle.md`](references/speed-and-lifecycle.md) — trigger setup, lifecycle-helper composition, the speed-optimization checklist, and the marketplace post-publish step.
+- [`references/speed-and-lifecycle.md`](references/speed-and-lifecycle.md) — trigger setup, core lifecycle ownership, the speed-optimization checklist, and the marketplace post-publish step.
 - [`references/review-lanes.md`](references/review-lanes.md) — the full four-lane breakdown of what `agent_creation_review` runs and what NOT to do with it.
 
 ## Authorization (current baseline)
@@ -104,7 +104,7 @@ Decide:
 Reference packages already on disk — pick by complexity:
 
 - **Simple single-node** (use as a template for a one-step agent): `@cinatra-ai/media-feed-lister-agent`, `@cinatra-ai/blog-idea-generator-agent`, `@cinatra-ai/media-transcript-agent`.
-- **HITL gate / re-entrant**: `@cinatra-ai/email-test-delivery-agent`, `@cinatra-ai/skill-recommender-agent`, `@cinatra-ai/trigger-agent`.
+- **HITL gate / re-entrant**: `@cinatra-ai/email-test-delivery-agent`.
 - **Connector-backed**: `@cinatra-ai/drupal-agent`, `@cinatra-ai/wordpress-agent`, `@cinatra-ai/email-recipient-selection-agent`, `@cinatra-ai/email-drafting-agent`.
 - **Multi-agent orchestrator** (FlowNode + subflow pattern): `@cinatra-ai/email-outreach-agent`.
 
@@ -119,7 +119,7 @@ The `metadata.cinatra.type` field in oas.json is one of:
 | Type | When to pick |
 |------|--------------|
 | `"node"` | Single-purpose self-contained step (e.g. summarise this URL, classify this contact). One AgentNode, no sub-agents, no mid-run HITL gate. **Pre-run setup-field HITL still applies** — see Step 3. |
-| `"flow"` | A flow with one or more **mid-run** HITL gates that pause execution between steps for user input. Same shape as the lifecycle helpers (skill-recommender, reviewer, trigger). |
+| `"flow"` | A flow with one or more **mid-run** HITL gates that pause execution between steps for user input. Same shape as `@cinatra-ai/email-test-delivery-agent`. |
 | `"leaf"` | Reusable building block that callers (orchestrators) compose. One AgentNode + optionally one mid-run HITL gate. |
 | `"orchestrator"` | Coordinates two or more sub-agents through their AgentCard contracts. MUST declare `metadata.cinatra.agentDependencies` (map of `@<vendor>/<slug>` → semver range). |
 
@@ -156,7 +156,7 @@ After every write, run:
    - When dispatching an existing agent (not your own freshly-published one), look up its `packageName` via `agent_source_list` or `agent_list { packageName }` — never derive it from the Verdaccio tarball name. If you only have a Verdaccio-rescoped name like `@<instance-namespace>/<slug>`, the resolver auto-aliases it to `@cinatra-ai/<slug>` for in-repo agents, but the canonical `@cinatra-ai` scope is authoritative.
    - **Dispatch hierarchy** (single canonical path): discover with `agent_list` (returns every installed agent — local `sourceType: "internal"` and remote A2A peers `sourceType: "external"`, including the agent-creation toolkit `@cinatra-ai/{planner-agent, code-reviewer-agent, security-reviewer-agent, lint-policy-agent}`), then dispatch with `agent_run { packageName, inputParams }` (ONE primitive — internal vs external is handled server-side by the executor in `packages/agents/src/a2a-actions.ts`). The retired surfaces (do NOT use): per-agent `cinatra_<slug>` function tools, the `_stage: true` wizard staging mechanic, the `a2a_agents_list` / `a2a_agent_dispatch` shims.
 
-Trigger setup, lifecycle-helper composition, and the speed-optimization checklist (Steps 7, 8, 8.5) live in **[`references/speed-and-lifecycle.md`](references/speed-and-lifecycle.md)**.
+Trigger setup, core lifecycle ownership, and the speed-optimization checklist (Steps 7, 8, 8.5) live in **[`references/speed-and-lifecycle.md`](references/speed-and-lifecycle.md)**.
 
 ### Step 9 — Confirm + link
 
@@ -180,7 +180,7 @@ Then offer: "Want me to wire a trigger, install it via the registry on another i
 - **Validate every write.** `agent_source_validate` must return `valid: true` before `agent_source_compile` or `agent_source_publish`.
 - **Bump `packageVersion` before re-publish.** A republish at the same version returns `alreadyPublished: true` silently — bump in both oas.json and package.json.
 - **HITL gates belong in `metadata.cinatra` blocks** (per-AgentNode `requiresApproval/riskClass/renderer` plus flow-level `hitlScreens`), never in prose only.
-- **Compose lifecycle helpers** rather than reimplementing trigger/skill-pick/review surfaces from scratch.
+- **Never build trigger/skill-pick/review surfaces into an agent.** Scheduling, skill recommendation and review are core lifecycle mechanisms — see `references/speed-and-lifecycle.md` Steps 7-8.
 - **executionProvider is "wayflow"**, never "langgraph" or "default" — those are migration artefacts. Most of the time you do not set it explicitly; the OAS pipeline handles it.
 - **Never show raw JSON in chat.** Always summarise with name, packageName, version, and a markdown link.
 
