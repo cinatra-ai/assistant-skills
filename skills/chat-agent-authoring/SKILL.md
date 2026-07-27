@@ -104,9 +104,11 @@ Decide:
 Reference packages already on disk — pick by complexity:
 
 - **Simple single-node** (use as a template for a one-step agent): `@cinatra-ai/media-feed-lister-agent`, `@cinatra-ai/blog-idea-generator-agent`, `@cinatra-ai/media-transcript-agent`.
-- **HITL gate / re-entrant**: `@cinatra-ai/email-test-delivery-agent`, `@cinatra-ai/reviewer-agent`, `@cinatra-ai/skill-recommender-agent`, `@cinatra-ai/trigger-agent`, `@cinatra-ai/auditor-agent`.
+- **HITL gate / re-entrant**: `@cinatra-ai/email-test-delivery-agent`, `@cinatra-ai/skill-recommender-agent`, `@cinatra-ai/trigger-agent`.
 - **Connector-backed**: `@cinatra-ai/drupal-agent`, `@cinatra-ai/wordpress-agent`, `@cinatra-ai/email-recipient-selection-agent`, `@cinatra-ai/email-drafting-agent`.
 - **Multi-agent orchestrator** (FlowNode + subflow pattern): `@cinatra-ai/email-outreach-agent`.
+
+Human approval of a produced artifact is deliberately **not** on that list: the platform runs review as a core checkpoint on the artifact lifecycle — whether it fires is decided by the review policy, not by agent wiring — so a producing agent never composes its own reviewer.
 
 **Read at least one of these with `agent_source_read` before producing your own oas.json — they are the golden examples.** Pick the one that most closely matches the agent shape you're about to author.
 
