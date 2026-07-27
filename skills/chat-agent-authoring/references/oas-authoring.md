@@ -140,7 +140,7 @@ Here is the smallest possible valid leaf (a `"node"`-type agent that prompts the
 }
 ```
 
-For a flow with a HITL gate, use `@cinatra-ai/skill-recommender-agent` as the template (call `agent_source_read packageSlug:"skill-recommender-agent"` first).
+For a flow with a HITL gate, use `@cinatra-ai/email-test-delivery-agent` as the template (call `agent_source_read packageSlug:"email-test-delivery-agent"` first).
 
 ## Orchestrator pattern (multi-agent compositions)
 
