@@ -30,7 +30,7 @@ Rules:
 - Do NOT explain what the agent does before dispatching. Do NOT ask for confirmation unless the user is only asking about the agent rather than asking to run it.
 - Pass `inputParams` as a JSON string using values already present in the prompt. If no structured input is obvious, pass `"{}"` and let the agent setup/HITL flow collect missing values.
 - After `agent_run` returns `{ runId, status: "queued" }`, call `agent_run_get` until the run reaches `completed`, `failed`, `pending_approval`, or `stopped` (see the `chat-run-polling` skill).
-- Legacy prompt wording like `cinatra_trigger-agent tool` means the package `@cinatra-ai/trigger-agent`; dispatch with `agent_run`, NOT a retired per-agent function tool (those were removed).
+- Legacy prompt wording like `cinatra_media-feed-lister-agent tool` means the package `@cinatra-ai/media-feed-lister-agent`; dispatch with `agent_run`, NOT a retired per-agent function tool (those were removed).
 - If the user asks to compare, list, describe, or find agents and does NOT ask to run one, do not dispatch. Use `agent_list` first.
 - If the user asks what is AVAILABLE or INSTALLABLE (not which installed agent to run) — "what can I install", "is there a `<X>` agent", "find me a package that…", "is `@cinatra-ai/<slug>` installable" — this is a **discovery** question, not a dispatch one. Read `chat-extension-discovery` and climb the full ladder. Do NOT answer "no such agent exists" from `agent_list` alone: `agent_list` shows only installed/saved agents, not the public registry (`extensions_search`), so an empty `agent_list` is never proof a package does not exist.
 
@@ -39,11 +39,11 @@ Few-shot examples (covering the canonical prompt shapes):
 - User: `Use the @cinatra-ai/email-test-delivery-agent agent to send a test email to me@example.com`
   First action: `agent_run({ "packageName": "@cinatra-ai/email-test-delivery-agent", "inputParams": "{\"recipient\":\"me@example.com\"}" })`
 
-- User: `Run @cinatra-ai/skill-recommender-agent so I can confirm which installed skills apply to the next step`
-  First action: `agent_run({ "packageName": "@cinatra-ai/skill-recommender-agent", "inputParams": "{}" })`
+- User: `Run @cinatra-ai/email-outreach-agent so I can set up the campaign from its setup form`
+  First action: `agent_run({ "packageName": "@cinatra-ai/email-outreach-agent", "inputParams": "{}" })`
 
-- User: `Invoke the cinatra_trigger-agent tool to configure an immediate trigger`
-  First action: `agent_run({ "packageName": "@cinatra-ai/trigger-agent", "inputParams": "{\"triggerType\":\"immediate\"}" })`
+- User: `Invoke the cinatra_media-feed-lister-agent tool to list the latest 5 items from https://example.com/feed.xml`
+  First action: `agent_run({ "packageName": "@cinatra-ai/media-feed-lister-agent", "inputParams": "{\"url\":\"https://example.com/feed.xml\",\"latestCount\":5}" })`
 
 - User: `Which agent can scrape a web page?`
   First action: `agent_list({ "query": "scrape" })` (this is asking ABOUT agents, not asking to run one)
