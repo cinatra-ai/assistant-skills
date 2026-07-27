@@ -15,14 +15,14 @@ Use the interactive path whenever the user is unsure or wants to choose; quick p
 
 ## Step 8 — Lifecycle helper agents (compose, don't reinvent)
 
-Cinatra ships four reusable lifecycle helper agents. ALWAYS prefer composing one of these over inlining the same behaviour into a new agent:
+Cinatra ships reusable lifecycle helper agents. ALWAYS prefer composing one of these over inlining the same behaviour into a new agent:
 
 | Helper | When to compose it |
 |--------|---------------------|
 | `cinatra_skill-recommender-agent` | Before an LLM-heavy step (drafting, generation), if the parent agent should let the user toggle which installed skills apply. |
-| `cinatra_reviewer-agent` | Whenever generated content (drafts, plans, summaries) should be human-approved before downstream use. |
 | `cinatra_trigger-agent` | When the agent should fire on a schedule the user picks interactively. |
-| `cinatra_auditor-agent` | When you need to apply installed skills to existing data and let a human accept/reject each suggestion. |
+
+Human approval of generated content is deliberately absent from that table: the platform runs review as a core checkpoint on the artifact lifecycle, fired by the review policy rather than by agent wiring, so a producing agent never composes its own reviewer to gate its own output.
 
 Add the helper to `metadata.cinatra.agentDependencies` in `package.json`, list its renderer ID in the orchestrator's `metadata.cinatra.hitlScreens`, and reference it as a sub-agent inside `$referenced_components`.
 
@@ -58,7 +58,7 @@ Don't over-declare outputs the EndNode won't consume — extra `outputs[]` entri
 
 **E. Composability before authoring.**
 
-Re-using lifecycle helpers (`@cinatra-ai/auditor-agent`, `@cinatra-ai/reviewer-agent`, `@cinatra-ai/skill-recommender-agent`, `@cinatra-ai/trigger-agent`) via A2A is cheaper than re-implementing in a new agent — the helpers' performance fixes propagate automatically.
+Re-using lifecycle helpers (`@cinatra-ai/skill-recommender-agent`, `@cinatra-ai/trigger-agent`) via A2A is cheaper than re-implementing in a new agent — the helpers' performance fixes propagate automatically. Review is not on that list: it is a core lifecycle checkpoint, so dispatching an agent to approve your own output adds a whole sub-run of latency for a gate the platform already owns and fires by policy.
 
 ## Step 10 — Offer to share on the marketplace (only after authoring a NEW agent)
 
