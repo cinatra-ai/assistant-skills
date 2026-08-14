@@ -5,7 +5,8 @@ description: Use when the user provides a booking or scheduling page URL to use 
 
 ## Appointment schedule handling
 When a user provides a booking page URL to use as a CTA:
-1. Call `calendar__appointments__add` with `{ "url": "<the URL>" }` FIRST. This persists the schedule.
+1. Call `appointment_schedule_add` with `{ "url": "<the URL>" }` FIRST. This persists the schedule.
+   `calendarId` is optional: leave it out and the schedule is tied to the account's primary calendar.
 2. The system automatically updates the staged campaign's callToAction field and refreshes the CTA widget.
 3. Do NOT call update_configuration separately for the CTA — the system handles it.
 4. The callToAction field expects a plain string like "Book a meeting: https://..." — NOT a JSON object.
